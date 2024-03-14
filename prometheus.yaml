@@ -1,0 +1,35 @@
+---
+- name: Install Prometheus in Kubernetes Cluster
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Install Helm
+      become: yes
+      apt:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - apt-transport-https
+        - gnupg2
+        - curl
+      tags:
+        - helm
+
+    - name: Add Helm Repository
+      become: yes
+      command: helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+      ignore_errors: yes
+      tags:
+        - helm
+
+    - name: Update Helm Repositories
+      become: yes
+      command: helm repo update
+      tags:
+        - helm
+
+    - name: Install Prometheus using Helm
+      become: yes
+      command: helm install prometheus prometheus-community/prometheus
+      tags:
+        - prometheus
